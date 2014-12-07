@@ -1,0 +1,63 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+div#header {
+    margin-bottom: 5px;
+}
+
+div#main > div, div#choose > div {
+    border: 1px solid black;
+}
+
+div#racing > div {
+    display: inline-block;
+}
+
+div#choose {
+    vertical-align: top;
+    width: 300px;
+}
+
+div#choose > div {
+    display: block;
+    height: 270px;
+}
+
+div#main > div {
+    vertical-align: top;
+}
+
+div#coding {
+    margin-left: 5px;
+    vertical-align: top;
+}
+
+#code-editor {
+    margin: 0;
+    height: 790px;
+    width: 600px;
+}
+
+div#actions {
+    text-align: center;
+}
+
+div#help {
+    margin-left: 5px;
+}
+
+div#commands > button {
+    margin: 5px;
+    padding: 5px;
+}
+
+div#footer {
+    text-align: center;
+    font-size: 12px;
+    padding: 5px;
+}

@@ -1,0 +1,135 @@
+extends layout
+
+block header
+    h1= title
+    div#timeLeft
+        span= "Time for next race: "
+        span#timer= "0:00"
+
+block main
+    div#racing
+        div#choose
+            div#chooseDriver
+                strong= "Default driver: Syrton Aenna"
+                br
+                | Speed: 3/3
+                br
+                | Reliability: 3/3
+                br
+                | Consistency: 3/3
+                br
+                | Overtaking: 3/3
+                br
+                | Defending: 3/3
+            div#chooseEngine
+                strong= "Default car: Reaunlt 1993"
+                br
+                | Consumption: 2/3
+                br
+                | Performance: 3/3
+                br
+                | Fuel tank: 100 L
+            div#chooseTire
+                strong= "Starting tire"
+                br
+                | Compound: medium
+        div#coding
+            pre#code-editor.
+                const fuelToAddOnPit = 30;
+                
+                var attack = false;
+                var firstPlace = (race.currentLap.myPosition == 1);
+                var thisLap = race.currentLap;
+                
+                if(thisLap.value % 10 === 0) {
+                    if(thisLap.temperature > 35) {
+                        pit('hard', fuelToAddOnPit);
+                    } else if(thisLap.temperature > 25) {
+                        pit('medium', fuelToAddOnPit);
+                    } else {
+                        pit('soft', fuelToAddOnPit);
+                    }
+                }
+                
+                if(!firstPlace && thisLap.myDistanceTo[thisLap.myPosition - 1] < 0.5) {
+                    attack = true;
+                }
+                
+                if(attack) {
+                    push();
+                }
+                
+                if(firstPlace && thisLap.myDistanceTo[2] > 10) {
+                    relax();
+                }
+                
+            div#actions
+                button#popupHelp(data-role='button')= "1) Don't click here!"
+                button#joinLeave(data-role='button')= "2) Join"
+                button#validate(data-role='button')= "3) Validate"
+                button#send(data-role='button', role='button')= "4) Send orders!"
+    div#help
+        div#variables
+            strong= "Variables with relevant information:"
+            p
+                i= " => race.currentLap.value (number)"
+                br
+                | Current lap number. Before the start it's value is 0 (zero).
+            p
+                i= "=> race.currentLap.temperature (number)"
+                br
+                | Track temperature on current lap (in Celsius).
+            p
+                i= "=> race.currentLap.myPosition (number)"
+                br
+                | Position of your car on the race. Position 0 (zero) doesn't exist.
+            p
+                i= "=> race.currentLap.myDistanceTo[position] (array of float)"
+                br
+                | All distances, in seconds, to the others cars on the track.
+                br
+                | Examples:
+                ul
+                    li= "race.currentLap.myDistanceTo[race.currentLap.myPosition] will return 0 (why? hmmm)"
+                    li= "race.currentLap.myDistanceTo[race.currentLap.myPosition - 1] will return the distance to the car in front of me."
+                    li= "race.currentLap.myDistanceTo[1] will return the distance to the race leader."
+                    li= "race.currentLap.myDistanceTo[0] is null and can break your code."
+        div#commands
+            p
+                strong= "All orders are valid to next lap ONLY! If you want it to last for more than one lap, you have to issue the command every lap."
+                br
+                br
+                strong= "Commands you can use:"
+            p
+                i= "=> pit(tireType, fuelToLoad)"
+                br
+                | Order your car to pit, <strong>tire compunds are 'soft', 'medium' and 'hard'</strong>. You can use it with the following options:
+                br
+                br
+                | Example: pit('soft', 10)
+                br
+                | Car will stop on next lap, change tires to soft compound and will up gas tank with 10 liters.
+                br
+                br
+                | Example: pit('medium')
+                br
+                | Car will stop on next lap, change tires to medium compound but won't fill up gas tank (pit stop might be faster).
+                br
+                br
+                | Example: pit(10)
+                br
+                | Car will stop on next lap, won't change tires, just fill up gas tank (why would you do that?).
+            p
+                i= "=> push()"
+                br
+                | Order to drive more agressively on the next lap. He will be faster, but also will spend more fuel and tires and be more prone to errors.
+                br
+                | You can only use this order for a limited number of laps (this changes from driver to driver).
+                br
+                | Once you exceeded the number of 'push laps', your driver will just ignore it (he might get upset?).
+            p
+                i= "=> relax()"
+                br
+                | Order to drive more carefully. It will save more fuel and tires, and less prone to errors. But he will be slower.
+            p
+                | Your can't receive both orders (push and relax). If, on the same lap, you tell him to push AND relax, he will ignore the "push" and will ONLY "relax".

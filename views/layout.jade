@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/jquery-ui.min.css')
+    link(rel='stylesheet', href='/stylesheets/jquery-ui.structure.min.css')
+    link(rel='stylesheet', href='/stylesheets/jquery-ui.theme.min.css')
+    script(src='/javascripts/jquery-2.1.1.min.js')
+    script(src='/javascripts/jquery-ui.min.js')
+    script(src='/javascripts/common.js')
+    script(src='/socket.io/socket.io.js')
+    script(src='/javascripts/ace.js')
+    script(src='/javascripts/peg-0.8.0.min.js')
+    script(src='/javascripts/jquery.countdown.min.js')
+    script(src='/javascripts/communication.js')
+    script(src='/javascripts/index.js')
+    
+  body
+    div#header
+      block header
+    div#main
+      block main
+    div#footer.
+      RaceCoding - 2014 (borned during 2014's Koding.com Hackathon)
