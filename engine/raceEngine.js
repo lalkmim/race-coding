@@ -32,7 +32,8 @@ RaceEngine.prototype.processLap = function(race, lapNumber) {
         var previousCarLap = previousLap.getCarLap(car);
         var carLap = new CarLap(lapNumber, car, lap, previousCarLap.tire, previousCarLap.fuelTank);
         
-        // LOAD PERMANENT PROBLEMS
+        // EVALUATE ORDERS
+        this.evaluateOrders(carLap);
         
         // UPDATE TIRE WEAR AND FUEL CONSUMPTION
         this.calculateTireWear(carLap, previousCarLap, race.track);
@@ -77,6 +78,16 @@ RaceEngine.prototype.processLap = function(race, lapNumber) {
     }
     
     race.laps.push(lap);
+};
+
+RaceEngine.prototype.evaluateOrders = function(carLap) {
+    var fullOrders = 'const race = { \n\
+        currentLap: { \n\
+            value: ' + carLap.lap.lapNumber + ', \n\
+            temperature: ' + carLap.lap.temperature + ', \n\
+            myPosition: ' + carLap.position + ' \n\
+        } \n\
+    };';
 };
 
 RaceEngine.prototype.calculateTemperature = function(previousTemperature) {
