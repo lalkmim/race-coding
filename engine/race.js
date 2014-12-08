@@ -1,8 +1,9 @@
+const config = require('./config');
+
 function Race(track, startingTemp) {
-    this.processed = false;
-    this.cancelled = false;
+    this.status = config.RACE_PENDING;
     this.laps = [];
-    this.drivers = [];
+    this.cars = [];
     
     this.track = track;
     this.startingTemperature = startingTemp;

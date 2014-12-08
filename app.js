@@ -18,11 +18,11 @@ console.log('raceController:', raceController);
 io.on('connection', function(socket) {
     console.log('>>> io.on.connection');
     
-    socket.on('addRacer', function(params) {
-        var driver = params.driver;
-        if(raceController.currentRace.drivers.indexOf(driver) < 0) {
-            raceController.currentRace.drivers.push(driver);
-            socket.emit('returnAddRacer', { result: true });
+    socket.on('addCar', function(params) {
+        var car = params.car;
+        if(raceController.currentRace.cars.indexOf(car) < 0) {
+            raceController.currentRace.cars.push(car);
+            socket.emit('returnAddCar', { result: true });
         }
     });
     

@@ -1,9 +1,10 @@
-function Track(id, name, length, straights, curves) {
+function Track(id, name, length, straights, curves, performanceRelevance) {
     this.id = id;
     this.name = name;
     this.length = length;
     this.straights = straights;
     this.curves = curves;
+    this.performanceRelevance = performanceRelevance;
 }
 
 Track.prototype.km = function() {

@@ -8,7 +8,7 @@ function buildSocketEventListeners(socket) {
         });
     });
     
-    socket.on('returnAddRacer', function(params) {
+    socket.on('returnAddCar', function(params) {
         if(params.result) {
             $('<div>Your request to join this race was approved!</div>').dialog({ modal: true, buttons: { 'OK': function() { $(this).dialog('close'); } } });
         } else {
@@ -17,15 +17,18 @@ function buildSocketEventListeners(socket) {
     });
     
     socket.on('returnDrivers', function(params) {
-        drivers = params.drivers;
+        console.log('>>> returnDrivers(params):', params);
+        drivers = params;
     });
     
     socket.on('returnEngines', function(params) {
-        engines = params.engines;
+        console.log('>>> returnEngines(params):', params);
+        engines = params;
     });
     
     socket.on('returnTires', function(params) {
-        tires = params.tires;
+        console.log('>>> returnTires(params):', params);
+        tires = params;
     });
 }
 
@@ -37,13 +40,9 @@ function loadRaceData() {
     console.log('>>> loadRaceData');
 }
 
-function joinRace(socket) {
+function joinRace(socket, car) {
     console.log('>>> joinRace');
-    socket.emit('addRacer', { 
-        driver: selectedDriver, 
-        startingTire: selectedTire, 
-        engine: selectedEngine
-    });
+    socket.emit('addCar', car);
 }
 
 function leaveRace(socket) {

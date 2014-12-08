@@ -1,4 +1,5 @@
 const config = require('./config');
+const RaceEngine = require('./raceEngine');
 
 var Race = require('./race');
 var Driver = require('./driver');
@@ -6,21 +7,21 @@ var Engine = require('./engine');
 var Tire = require('./tire');
 var Track = require('./track');
 
-function RaceManager(minTemp) {
+function RaceManager() {
     this.races = [];
     this.drivers = [];
     this.engines = [];
     this.tires = [];
     this.tracks = [];
+    
     this.nextRacePos = -1;
     this.currentRace = null;
+    this.raceEngine = RaceEngine;
 }
-
-RaceManager.prototype.raceEngine = require('./raceEngine');
 
 RaceManager.prototype.createRace = function(shouldCreateTrack) {
     var selectedTrack = this.selectRandomTrack(shouldCreateTrack);
-    var startingTemperature = config.START_TEMPERATURE_MINIMUM + parseInt(Math.random() * config.START_TEMPERATURE_RANGE, 10);
+    var startingTemperature = config.TRACK_START_TEMPERATURE_MIN + parseInt(Math.random() * config.TRACK_START_TEMPERATURE_RANGE, 10);
     
     var race = new Race(selectedTrack, startingTemperature);
     
@@ -29,9 +30,12 @@ RaceManager.prototype.createRace = function(shouldCreateTrack) {
         race.startTime.setMinutes(race.startTime.getMinutes() + config.RACE_INTERVAL + 1);
         race.startTime.setSeconds(0);
         race.startTime.setMilliseconds(0);
+        
+        this.nextRacePos = 0;
+        this.currentRace = race;
     } else {
-        race.startTime = this.races[this.races.length - 1].startTime;
-        race.startTime.setMinutes(startTime.getMinutes() + config.RACE_INTERVAL);
+        race.startTime = new Date(this.races[this.races.length - 1].startTime);
+        race.startTime.setMinutes(race.startTime.getMinutes() + config.RACE_INTERVAL);
     }
     
     this.races.push(race);
@@ -52,12 +56,6 @@ RaceManager.prototype.selectRandomTrack = function(shouldCreateTrack) {
     var pos = parseInt(Math.random() * this.tracks.length, 10);
     
     return this.tracks[pos];
-};
-
-RaceManager.prototype.createFirstRace = function(shouldCreateTrack) {
-    this.createRace(shouldCreateTrack);
-    this.nextRacePos = 0;
-    this.currentRace = this.races[this.nextRacePos];
 };
 
 RaceManager.prototype.processNextRace = function(shouldCreateRace) {
@@ -81,11 +79,12 @@ RaceManager.prototype.processNextRace = function(shouldCreateRace) {
 };
 
 RaceManager.prototype.processRace = function(pos) {
-    var race = this.races[pos];
     this.currentRace = this.races[pos];
+    var race = this.currentRace;
+    race.status = config.RACE_PROCESSING;
     
-    if(race.drivers.length === 0) {
-        race.processed = true;
+    if(race.cars.length === 0) {
+        race.status = config.RACE_PROCESSED;
         this.currentRace = null;
         this.lastRace = race;
         throw {
@@ -94,26 +93,25 @@ RaceManager.prototype.processRace = function(pos) {
         };
     }
     
-    for(var i=0; i<race.laps.length; i++) {
-        this.processLap(race, i);
+    this.raceEngine.processGrid(race);
+    for(var i=1; i<=race.track.totalLaps(); i++) {
+        this.raceEngine.processLap(race, i);
     }
-    race.processed = true;
+    
+    race.status = config.RACE_PROCESSED;
     this.lastRace = race;
-    this.currentRace = null;
     this.nextRacePos++;
-};
+}
 
 RaceManager.prototype.cancelRace = function(pos) {
     var race = this.races[pos];
-    race.processed = true;
-    race.cancelled = true;
+    race.status = RACE_CANCELLED;
     if(race == this.currentRace) {
         
     }
 };
 
 RaceManager.prototype.getCurrentRaceStartTime = function() {
-    console.log('currentRace:', this.currentRace);
     if(this.currentRace === null) {
         throw {
             id: 4,
@@ -125,19 +123,28 @@ RaceManager.prototype.getCurrentRaceStartTime = function() {
 };
 
 RaceManager.prototype.generateRandomTrack = function() {
-    var id = parseInt(Math.random() * config.TRACK_ID_GENERATOR_RANGE, 10);
-    var name = 'Generated track #' + id;
+    var id = rnd(1, config.TRACK_ID_GENERATOR_RANGE);
+    var name = 'Track #' + id;
+    
     var straights = {
-        percentual: config.TRACK_STRAIGHTS_PERCENTAGE_MINIMUM + parseInt(Math.random() * config.TRACK_STRAIGHTS_PERCENTAGE_RANGE, 10),
-        avgSpeed: config.TRACK_STRAIGHTS_AVG_SPEED_MINIMUM + parseInt(Math.random() * config.TRACK_STRAIGHTS_AVG_SPEED_RANGE, 10)
+        percentual: rnd(config.TRACK_STRAIGHTS_PERCENTAGE_MIN, config.TRACK_STRAIGHTS_PERCENTAGE_RANGE),
+        avgSpeed: rnd(config.TRACK_STRAIGHTS_AVG_SPEED_MIN, config.TRACK_STRAIGHTS_AVG_SPEED_RANGE)
     };
+    
     var curves = {
         percentual: 100 - straights.percentual,
-        avgSpeed: config.TRACK_CURVES_AVG_SPEED_MINIMUM + parseInt(Math.random() * config.TRACK_CURVES_AVG_SPEED_RANGE, 10)
+        avgSpeed: rnd(config.TRACK_CURVES_AVG_SPEED_MIN, config.TRACK_CURVES_AVG_SPEED_RANGE)
     };
-    var length = config.TRACK_LENGTH_MINIMUM + parseInt(Math.random() * config.TRACK_LENGTH_RANGE, 10);
     
-    var track = new Track(id, name, length, straights, curves);
+    var length = rnd(config.TRACK_LENGTH_MIN, config.TRACK_LENGTH_RANGE);
+    
+    var performanceRelevance = {
+      driver: rnd(config.TRACK_PERFORMANCE_RELEVANCE_DRIVER_MIN, config.TRACK_PERFORMANCE_RELEVANCE_DRIVER_RANGE),
+      engine: rnd(config.TRACK_PERFORMANCE_RELEVANCE_ENGINE_MIN, config.TRACK_PERFORMANCE_RELEVANCE_ENGINE_RANGE)
+    };
+    performanceRelevance.tire = 100 - performanceRelevance.driver - performanceRelevance.engine;
+    
+    var track = new Track(id, name, length, straights, curves, performanceRelevance);
     
     this.tracks.push(track);
 };
@@ -176,11 +183,39 @@ RaceManager.prototype.generateRandomDriver = function() {
 };
 
 RaceManager.prototype.generateRandomEngine = function() {
+    var id = rnd(1, config.ENGINE_ID_GENERATOR_RANGE);
+    var name = 'Engine #' + id;
+    var reliability = rnd(config.ENGINE_RELIABILITY_MIN, config.ENGINE_RELIABILITY_RANGE);
+    var fuelConsumptionRate = rnd(config.ENGINE_FUEL_CONSUMPTION_RATE_MIN, config.ENGINE_FUEL_CONSUMPTION_RATE_RANGE);
+    var fuelTankSize = rnd(config.ENGINE_FUEL_TANK_SIZE_MIN, config.ENGINE_FUEL_TANK_SIZE_RANGE);
+    var horsePower = rnd(config.ENGINE_HP_MIN, config.ENGINE_HP_RANGE);
     
+    return new Engine(id, name, reliability, fuelConsumptionRate, fuelTankSize, horsePower);
 };
 
 RaceManager.prototype.generateRandomTire = function() {
+    var id = rnd(1, config.TIRE_ID_GENERATOR_RANGE);
+    var name = 'Tire #' + id;
     
+    var soft = {
+        type: 'soft',
+        kmAt20Celsius: rnd(config.TIRE_SOFT_KM_AT_20_CELSIUS_MIN, config.TIRE_SOFT_KM_AT_20_CELSIUS_RANGE),
+        performance: config.TIRE_SOFT_PERFORMANCE_PERCENTAGE
+    };
+    
+    var medium = {
+        type: 'medium',
+        kmAt20Celsius: rnd(config.TIRE_MEDIUM_KM_AT_20_CELSIUS_MIN, config.TIRE_MEDIUM_KM_AT_20_CELSIUS_RANGE),
+        performance: rnd(config.TIRE_MEDIUM_PERFORMANCE_PERCENTAGE_MIN, config.TIRE_MEDIUM_PERFORMANCE_PERCENTAGE_RANGE)
+    };
+    
+    var hard = {
+        type: 'hard',
+        kmAt20Celsius: rnd(config.TIRE_HARD_KM_AT_20_CELSIUS_MIN, config.TIRE_HARD_KM_AT_20_CELSIUS_RANGE),
+        performance: rnd(config.TIRE_HARD_PERFORMANCE_PERCENTAGE_MIN, config.TIRE_HARD_PERFORMANCE_PERCENTAGE_RANGE)
+    };
+    
+    return new Tire(id, name, soft, medium, hard);
 };
 
 function rnd(min, range) {

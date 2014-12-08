@@ -25,10 +25,16 @@ $(document).ready(function() {
     
     $('button#joinLeave').button().click(function() {
         if($(this).text() == '2) Join') {
-            joinRace(socket);
+            joinRace(socket, { 
+                driver: drivers[0], 
+                engine: engines[0],
+                tire: tires[0]
+            });
+            
             $(this).text('2) Leave (???)');
         } else {
             leaveRace(socket);
+            
             $(this).text('2) Join');
         }
     });
