@@ -13,15 +13,15 @@ var server = http.Server(app);
 var io = require('socket.io')(server);
 
 var raceController = require('./engine/controller');
-console.log('raceController:', raceController);
 
 io.on('connection', function(socket) {
     console.log('>>> io.on.connection');
     
     socket.on('addCar', function(params) {
-        var car = params.car;
+        var car = params;
         if(raceController.currentRace.cars.indexOf(car) < 0) {
             raceController.currentRace.cars.push(car);
+            console.log('socket.on.addCar(raceController.currentRace)', raceController.currentRace);
             socket.emit('returnAddCar', { result: true });
         }
     });
@@ -44,6 +44,11 @@ io.on('connection', function(socket) {
     
     socket.on('getTires', function() {
         socket.emit('returnTires', raceController.tires);
+    });
+    
+    socket.on('getLastRace', function() {
+        var raceReport = raceController.raceReport(raceController.lastRace);
+        socket.emit('returnLastRace', raceReport);
     });
 });
 

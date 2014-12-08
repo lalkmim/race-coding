@@ -3,6 +3,7 @@ var editor = null;
 var drivers = [];
 var engines = [];
 var tires = [];
+var lastRace = {};
 
 $(document).ready(function() {
     editor = ace.edit("code-editor");
@@ -23,25 +24,27 @@ $(document).ready(function() {
         $('div#help').dialog('open');
     });
     
-    $('button#joinLeave').button().click(function() {
-        if($(this).text() == '2) Join') {
-            joinRace(socket, { 
-                driver: drivers[0], 
-                engine: engines[0],
-                tire: tires[0]
-            });
-            
-            $(this).text('2) Leave (???)');
-        } else {
-            leaveRace(socket);
-            
-            $(this).text('2) Join');
-        }
+    $('button#send').button().click(function() {
+        var car = {
+            id: parseInt(Math.random() * 1000000),
+            driver: drivers[0], 
+            engine: engines[0],
+            tire: tires[0],
+            startingTire: tires[0].compounds.soft,
+            startingFuel: 50,
+            orders: editor.getValue()
+        };
+        
+        joinRace(socket, car);
+        
+        $(this).button('option', 'disabled', true);
     });
     
-    $('button#validate').button();
-    
     $('button#send').button();
+    
+    $('button#lastRace').button().click(function() {
+        getLastRace(socket);
+    });
     
     socket = io.connect();
     

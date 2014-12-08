@@ -101,6 +101,8 @@ RaceManager.prototype.processRace = function(pos) {
     race.status = config.RACE_PROCESSED;
     this.lastRace = race;
     this.nextRacePos++;
+    
+    console.log('>>> processRace.finished');
 }
 
 RaceManager.prototype.cancelRace = function(pos) {
@@ -186,7 +188,7 @@ RaceManager.prototype.generateRandomEngine = function() {
     var id = rnd(1, config.ENGINE_ID_GENERATOR_RANGE);
     var name = 'Engine #' + id;
     var reliability = rnd(config.ENGINE_RELIABILITY_MIN, config.ENGINE_RELIABILITY_RANGE);
-    var fuelConsumptionRate = rnd(config.ENGINE_FUEL_CONSUMPTION_RATE_MIN, config.ENGINE_FUEL_CONSUMPTION_RATE_RANGE);
+    var fuelConsumptionRate = rnd(config.ENGINE_FUEL_CONSUMPTION_RATE_MIN, config.ENGINE_FUEL_CONSUMPTION_RATE_RANGE) / 100;
     var fuelTankSize = rnd(config.ENGINE_FUEL_TANK_SIZE_MIN, config.ENGINE_FUEL_TANK_SIZE_RANGE);
     var horsePower = rnd(config.ENGINE_HP_MIN, config.ENGINE_HP_RANGE);
     
@@ -217,6 +219,31 @@ RaceManager.prototype.generateRandomTire = function() {
     
     return new Tire(id, name, soft, medium, hard);
 };
+
+
+RaceManager.prototype.raceReport = function(race) {
+    var laps = [];
+    
+    for(var i=0; i<race.laps.length; i++) {
+        var lap = race.laps[i];
+        var reportLap = {
+            lapNumber: i,
+            cars: []
+        };
+        for(var j=0; j<lap.carsLap.length; j++) {
+            var carLap = lap.carsLap[j];
+            reportLap.cars.push({
+                id: carLap.car.id,
+                lapTime: carLap.lapTime,
+                events: carLap.events
+            });
+        }
+        laps.push(reportLap);
+    }
+    
+    return laps;
+};
+
 
 function rnd(min, range) {
     return min + parseInt(Math.random() * range, 10);

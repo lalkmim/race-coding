@@ -65,9 +65,8 @@ block main
                 
             div#actions
                 button#popupHelp(data-role='button')= "1) Don't click here!"
-                button#joinLeave(data-role='button')= "2) Join"
-                button#validate(data-role='button')= "3) Validate"
-                button#send(data-role='button', role='button')= "4) Send orders!"
+                button#send(data-role='button', role='button')= "2) Send orders!"
+                button#lastRace(data-role='button')= "Last Race"
     div#help
         div#variables
             strong= "Variables with relevant information:"
@@ -84,16 +83,16 @@ block main
                 br
                 | Position of your car on the race. Position 0 (zero) doesn't exist.
             p
-                i= "=> race.currentLap.myDistanceTo[position] (array of float)"
+                i= "=> race.currentLap.myDistanceTo(position) (float)"
                 br
                 | All distances, in seconds, to the others cars on the track.
                 br
                 | Examples:
                 ul
-                    li= "race.currentLap.myDistanceTo[race.currentLap.myPosition] will return 0 (why? hmmm)"
-                    li= "race.currentLap.myDistanceTo[race.currentLap.myPosition - 1] will return the distance to the car in front of me."
-                    li= "race.currentLap.myDistanceTo[1] will return the distance to the race leader."
-                    li= "race.currentLap.myDistanceTo[0] is null and can break your code."
+                    li= "race.currentLap.myDistanceTo(race.currentLap.myPosition) will return 0 (why? hmmm)"
+                    li= "race.currentLap.myDistanceTo(race.currentLap.myPosition - 1) will return the distance to the car in front of me."
+                    li= "race.currentLap.myDistanceTo(1) will return the distance to the race leader."
+                    li= "race.currentLap.myDistanceTo(0) is null and can break your code."
         div#commands
             p
                 strong= "All orders are valid to next lap ONLY! If you want it to last for more than one lap, you have to issue the command every lap."

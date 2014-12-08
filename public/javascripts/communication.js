@@ -30,6 +30,11 @@ function buildSocketEventListeners(socket) {
         console.log('>>> returnTires(params):', params);
         tires = params;
     });
+    
+    socket.on('returnLastRace', function(params) {
+        console.log('>>> returnLastRace(params):', params);
+        lastRace = params;
+    });
 }
 
 function getCurrentRaceStartTime(socket) {
@@ -63,4 +68,9 @@ function getEngines(socket) {
 function getTires(socket) {
     console.log('>>> getTires');
     socket.emit('getTires');
+}
+
+function getLastRace(socket) {
+    console.log('>>> getLastRace');
+    socket.emit('getLastRace');
 }
