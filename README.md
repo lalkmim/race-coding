@@ -16,5 +16,3 @@ Built with:
 - [Ace]
 - [PEG.js]
 - [Final Countdown](http://hilios.github.io/jQuery.countdown/)
-- 
-
