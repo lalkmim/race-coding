@@ -87,7 +87,33 @@ RaceEngine.prototype.evaluateOrders = function(carLap) {
             temperature: ' + carLap.lap.temperature + ', \n\
             myPosition: ' + carLap.position + ' \n\
         } \n\
-    };';
+    }; \n\
+    \n\
+    var returnValues = {\n\
+        push: false,\n\
+        relax: false,\n\
+        pit: false,\n\
+        tyre: null,\n\
+        fuel: 0\n\
+    };\n\
+    \n\
+    const push = function() {\n\
+        returnValues.push = true;\n\
+    };\n\
+    \n\
+    const relax = function() {\n\
+        returnValues.relax = true;\n\
+    };\n\
+    \n\
+    const pit = function(tire, fuel) {\n\
+        returnValues.pit = true;\n\
+        returnValues.tire = tire;\n\
+        returnValues.fuel = fuel;\n\
+    }';
+    
+    fullOrders += carLap.car.orders;
+    
+    fullOrders += 'return returnValues;';
 };
 
 RaceEngine.prototype.calculateTemperature = function(previousTemperature) {
