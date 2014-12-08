@@ -7,19 +7,14 @@ raceManager.loadDrivers(3);
 raceManager.loadEngines(3);
 raceManager.loadTires(1);
 
-for(var i=0; i<5; i++) {
-    raceManager.createRace(true);
-}
-
-console.log('raceManager:', raceManager);
+raceManager.createRace(true);
 
 setTimeout(function() { 
-//    try {
-        raceManager.processNextRace(false);
-//    } catch(e) {
-//        console.log('Race aborted', e);
-//    }
-}, 15000);
-//}, (raceManager.currentRace.startTime - new Date()));
+    try {
+        raceManager.processNextRace(true);
+    } catch(e) {
+        console.log('Race aborted', e);
+    }
+}, (raceManager.currentRace.startTime - new Date()));
 
 module.exports = raceManager;
